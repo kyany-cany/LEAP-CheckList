@@ -306,7 +306,9 @@
         color: #2563eb;
       }
 
-      .checklist-panel.mode-edit-plus .mode-switch button[data-mode="edit-plus"].is-active {
+      .checklist-panel.mode-edit-plus
+        .mode-switch
+        button[data-mode="edit-plus"].is-active {
         background: #fef3c7;
         color: #b45309;
       }
@@ -321,8 +323,9 @@
         outline: none;
         line-height: 1.5;
         font-size: 0.85rem;
-        font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
-          Consolas, monospace;
+        font-family:
+          ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+          monospace;
         color: #0f172a;
         background: #fff;
       }
@@ -342,7 +345,7 @@
       .toast-container {
         position: fixed;
         bottom: 24px;
-        right: 24px;
+        left: 24px;
         z-index: 9999;
         display: flex;
         flex-direction: column;
@@ -748,11 +751,23 @@
               <line x1="9.5" y1="5.5" x2="9.5" y2="18.5" />
             </svg>
           </button>
-          <div class="mode-switch" id="mode-switch" role="group" aria-label="表示モード">
-            <button type="button" data-mode="check" class="is-active" aria-pressed="true">
+          <div
+            class="mode-switch"
+            id="mode-switch"
+            role="group"
+            aria-label="表示モード"
+          >
+            <button
+              type="button"
+              data-mode="check"
+              class="is-active"
+              aria-pressed="true"
+            >
               チェック
             </button>
-            <button type="button" data-mode="edit" aria-pressed="false">編集</button>
+            <button type="button" data-mode="edit" aria-pressed="false">
+              編集
+            </button>
             <button type="button" data-mode="edit-plus" aria-pressed="false">
               編集+
             </button>
@@ -1051,7 +1066,7 @@
         renderChecklist();
       }
 
-      const TOAST_DURATION = 4000;
+      const TOAST_DURATION = 6000;
       const TOAST_MAX_LINES = 5;
 
       function showToast(errors) {
@@ -1139,9 +1154,7 @@
           for (const sub of cat.subs) {
             lines.push(`### ${sub.title}`, "");
             for (const item of sub.items) {
-              lines.push(
-                `- [${item.checked ? "x" : " "}] ${item.text}`,
-              );
+              lines.push(`- [${item.checked ? "x" : " "}] ${item.text}`);
             }
             lines.push("");
           }
@@ -1231,7 +1244,8 @@
           if (/^-\s+\[/.test(line)) {
             errors.push({
               line: lineNum,
-              message: "チェックボックス形式が不正です（`- [ ]` または `- [x]`）",
+              message:
+                "チェックボックス形式が不正です（`- [ ]` または `- [x]`）",
             });
             continue;
           }
@@ -1239,7 +1253,8 @@
           if (/^-\s+/.test(line)) {
             errors.push({
               line: lineNum,
-              message: "チェックボックス形式が不正です（`- [ ]` または `- [x]`）",
+              message:
+                "チェックボックス形式が不正です（`- [ ]` または `- [x]`）",
             });
             continue;
           }

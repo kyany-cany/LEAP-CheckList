@@ -1,702 +1,2042 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>スライド作成チェックリスト — マインドマップ</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スライド作成チェックリスト — マインドマップ</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/mind-elixir/dist/MindElixir.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
 
-  body {
-    margin: 0;
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    background: #f1f5f9;
-    color: #0f172a;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+      body {
+        margin: 0;
+        font-family: "Inter", "Noto Sans JP", sans-serif;
+        background: #f1f5f9;
+        color: #0f172a;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
 
-  .app-header {
-    padding: 16px 24px;
-    background: #fff;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-shrink: 0;
-  }
+      .app-header {
+        padding: 16px 24px;
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-shrink: 0;
+      }
 
-  .app-header h1 {
-    margin: 0;
-    font-size: 1.15rem;
-    font-weight: 700;
-  }
+      .app-header h1 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 700;
+      }
 
-  .app-header p {
-    margin: 4px 0 0;
-    font-size: 0.8rem;
-    color: #64748b;
-  }
+      .app-header p {
+        margin: 4px 0 0;
+        font-size: 0.8rem;
+        color: #64748b;
+      }
 
-  .progress {
-    text-align: right;
-    flex-shrink: 0;
-  }
+      .progress {
+        text-align: right;
+        flex-shrink: 0;
+      }
 
-  .progress-count {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #2563eb;
-  }
+      .progress-count {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2563eb;
+      }
 
-  .progress-label {
-    font-size: 0.75rem;
-    color: #94a3b8;
-  }
+      .progress-label {
+        font-size: 0.75rem;
+        color: #94a3b8;
+      }
 
-  .progress-bar {
-    width: 120px;
-    height: 6px;
-    background: #e2e8f0;
-    border-radius: 999px;
-    margin-top: 6px;
-    overflow: hidden;
-  }
+      .progress-bar {
+        width: 120px;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        margin-top: 6px;
+        overflow: hidden;
+      }
 
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #6366f1);
-    border-radius: 999px;
-    transition: width 0.3s ease;
-  }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #6366f1);
+        border-radius: 999px;
+        transition: width 0.3s ease;
+      }
 
-  .main {
-    flex: 1;
-    display: grid;
-    grid-template-columns: minmax(320px, 420px) 1fr;
-    min-height: 0;
-  }
+      .main {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+        min-width: 0;
+      }
 
-  @media (max-width: 900px) {
-    body { height: auto; overflow: auto; }
-    .main { grid-template-columns: 1fr; grid-template-rows: auto 60vh; }
-  }
+      .checklist-panel {
+        width: var(--checklist-width, 380px);
+        min-width: 280px;
+        max-width: min(70vw, calc(100vw - 240px));
+        flex-shrink: 0;
+        background: #fff;
+        transition: width 0.2s ease;
+      }
 
-  .panel {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
+      @media (min-width: 901px) {
+        .checklist-panel.is-collapsed {
+          width: var(--checklist-collapsed-width, 56px) !important;
+          min-width: 0 !important;
+          max-width: none !important;
+        }
 
-  .panel-header {
-    padding: 12px 20px;
-    background: #fff;
-    border-bottom: 1px solid #e2e8f0;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #475569;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
+        .main.is-checklist-collapsed .panel-resizer {
+          display: none;
+        }
+      }
 
-  .panel-header span {
-    font-weight: 400;
-    color: #94a3b8;
-    font-size: 0.75rem;
-  }
+      .checklist-panel.is-collapsed .checklist-panel-content,
+      .checklist-panel.is-collapsed .mode-switch {
+        display: none;
+      }
 
-  .checklist-panel {
-    border-right: 1px solid #e2e8f0;
-    background: #fff;
-  }
+      .checklist-panel.is-collapsed .checklist-panel-header {
+        border-bottom: none;
+        justify-content: center;
+        padding: 4px 4px;
+      }
 
-  .checklist-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 0 24px;
-  }
+      .checklist-panel-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+      }
 
-  .category {
-    margin-top: 8px;
-  }
+      .btn-collapse-checklist {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #475569;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition:
+          background 0.15s,
+          border-color 0.15s,
+          color 0.15s;
+      }
 
-  .category-title {
-    padding: 10px 20px 6px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #1e293b;
-    position: sticky;
-    top: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(4px);
-    z-index: 1;
-  }
+      .btn-collapse-checklist svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
 
-  .subcategory {
-    margin-left: 0;
-  }
+      .btn-collapse-checklist:hover {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #334155;
+      }
 
-  .subcategory-title {
-    padding: 6px 20px 4px 28px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #64748b;
-  }
+      .checklist-panel.is-collapsed .btn-collapse-checklist {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #2563eb;
+      }
 
-  .check-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 7px 20px 7px 36px;
-    cursor: pointer;
-    transition: background 0.15s;
-    line-height: 1.45;
-    font-size: 0.875rem;
-  }
+      .panel-resizer {
+        width: 6px;
+        flex-shrink: 0;
+        cursor: col-resize;
+        background: #e2e8f0;
+        position: relative;
+        touch-action: none;
+        transition: background 0.15s;
+      }
 
-  .check-item:hover { background: #f8fafc; }
+      .panel-resizer::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 2px;
+        height: 32px;
+        border-radius: 999px;
+        background: #cbd5e1;
+        transition:
+          background 0.15s,
+          height 0.15s;
+      }
 
-  .check-item.checked {
-    background: #eff6ff;
-  }
+      .panel-resizer:hover,
+      .panel-resizer.is-dragging {
+        background: #dbeafe;
+      }
 
-  .check-item.checked .item-label {
-    color: #1d4ed8;
-  }
+      .panel-resizer:hover::after,
+      .panel-resizer.is-dragging::after {
+        background: #60a5fa;
+        height: 48px;
+      }
 
-  .check-item input[type="checkbox"] {
-    margin-top: 3px;
-    width: 16px;
-    height: 16px;
-    accent-color: #2563eb;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
+      .tree-panel {
+        flex: 1;
+        min-width: 200px;
+        background: #f8fafc;
+      }
 
-  .item-label { flex: 1; }
+      body.is-resizing-panels {
+        cursor: col-resize;
+        user-select: none;
+      }
 
-  .toolbar {
-    padding: 8px 16px;
-    border-top: 1px solid #e2e8f0;
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-    background: #fafafa;
-  }
+      body.is-resizing-panels * {
+        cursor: col-resize !important;
+      }
 
-  .btn {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-    font-family: inherit;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background: #fff;
-    color: #475569;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+      @media (max-width: 900px) {
+        body {
+          height: auto;
+          overflow: auto;
+        }
+        .main {
+          flex-direction: column;
+        }
+        .checklist-panel {
+          width: 100% !important;
+          max-width: none;
+          min-width: 0;
+        }
+        .panel-resizer {
+          display: none;
+        }
+        .tree-panel {
+          min-height: 60vh;
+          min-width: 0;
+        }
+      }
 
-  .btn:hover {
-    background: #f1f5f9;
-    border-color: #94a3b8;
-  }
+      .panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+      }
 
-  .mindmap-panel {
-    background: #f8fafc;
-  }
+      .panel-header {
+        padding: 4px 4px;
+        height: 40px;
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
 
-  .mindmap-body {
-    flex: 1;
-    overflow: auto;
-    padding: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
+      .panel-header span {
+        font-weight: 400;
+        color: #94a3b8;
+        font-size: 0.75rem;
+      }
 
-  .empty-state {
-    text-align: center;
-    color: #94a3b8;
-    padding: 60px 24px;
-    max-width: 320px;
-  }
+      .mode-switch {
+        display: inline-flex;
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        overflow: hidden;
+        background: #f8fafc;
+      }
 
-  .empty-state svg {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
+      .mode-switch button {
+        font-size: 0.7rem;
+        font-weight: 500;
+        padding: 4px 10px;
+        border: none;
+        border-right: 1px solid #cbd5e1;
+        background: transparent;
+        color: #475569;
+        cursor: pointer;
+        font-family: inherit;
+        line-height: 1.4;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
 
-  .empty-state p {
-    margin: 0;
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
+      .mode-switch button:last-child {
+        border-right: none;
+      }
 
-  #mindmap-container .mermaid svg {
-    min-width: 900px;
-    max-width: none !important;
-    height: auto !important;
-  }
+      .mode-switch button:hover {
+        background: #f1f5f9;
+      }
 
-  .mindmap-meta {
-    font-size: 0.75rem;
-    color: #64748b;
-    font-weight: 400;
-  }
-</style>
-</head>
-<body>
+      .mode-switch button.is-active {
+        background: #eff6ff;
+        color: #2563eb;
+      }
 
-<header class="app-header">
-  <div>
-    <h1>スライド作成チェックリスト</h1>
-    <p>左でチェック → 右のマインドマップに反映（デモ）</p>
-  </div>
-  <div class="progress">
-    <div class="progress-count"><span id="checked-count">0</span> / <span id="total-count">0</span></div>
-    <div class="progress-label">チェック済み</div>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-  </div>
-</header>
+      .checklist-panel.mode-edit-plus .mode-switch button[data-mode="edit-plus"].is-active {
+        background: #fef3c7;
+        color: #b45309;
+      }
 
-<div class="main">
-  <section class="panel checklist-panel">
-    <div class="panel-header">
-      チェックリスト
-      <span>チェックリスト.md より</span>
-    </div>
-    <div class="checklist-body" id="checklist-root"></div>
-    <div class="toolbar">
-      <button class="btn" id="btn-check-all">すべてチェック</button>
-      <button class="btn" id="btn-uncheck-all">すべて解除</button>
-      <button class="btn" id="btn-reset">リセット</button>
-    </div>
-  </section>
+      .markdown-editor {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+        resize: none;
+        padding: 12px 16px;
+        border: none;
+        outline: none;
+        line-height: 1.5;
+        font-size: 0.85rem;
+        font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+          Consolas, monospace;
+        color: #0f172a;
+        background: #fff;
+      }
 
-  <section class="panel mindmap-panel">
-    <div class="panel-header">
-      マインドマップ
-      <span class="mindmap-meta" id="mindmap-meta">チェックした項目を表示</span>
-    </div>
-    <div class="mindmap-body" id="mindmap-body">
-      <div class="empty-state" id="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
-          <path d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-        </svg>
-        <p>チェックリストから項目を選ぶと、<br>ここにマインドマップが生成されます。</p>
+      .checklist-panel.mode-edit-plus .checklist-body {
+        display: none;
+      }
+
+      .checklist-panel.mode-edit-plus .markdown-editor {
+        display: block;
+      }
+
+      .checklist-panel.mode-edit-plus .toolbar {
+        display: none;
+      }
+
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+        max-width: min(420px, calc(100vw - 48px));
+      }
+
+      .toast {
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.25s ease,
+          transform 0.25s ease;
+      }
+
+      .toast.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.is-error {
+        border-color: #fca5a5;
+        background: #fef2f2;
+      }
+
+      .toast-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #991b1b;
+        margin-bottom: 6px;
+      }
+
+      .toast-body {
+        font-size: 0.8rem;
+        color: #7f1d1d;
+        line-height: 1.45;
+      }
+
+      .toast-more {
+        margin-top: 4px;
+        font-size: 0.75rem;
+        color: #b91c1c;
+        opacity: 0.85;
+      }
+
+      .checklist-panel.mode-check .btn-add-item {
+        display: none;
+      }
+
+      .checklist-panel.mode-check .check-item {
+        cursor: pointer;
+      }
+
+      .checklist-panel.mode-check .item-label {
+        cursor: default;
+        padding: 0;
+        margin: 0;
+      }
+
+      .checklist-panel.mode-check .item-label:hover {
+        background: transparent;
+      }
+
+      .checklist-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0 24px;
+      }
+
+      .category {
+        margin-top: 8px;
+      }
+
+      .category-title {
+        padding: 10px 20px 6px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+        position: sticky;
+        top: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(4px);
+        z-index: 1;
+      }
+
+      .subcategory {
+        margin-left: 0;
+      }
+
+      .subcategory-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 16px 4px 28px;
+      }
+
+      .subcategory-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #64748b;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .btn-add-item {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #fff;
+        color: #64748b;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+      }
+
+      .btn-add-item:hover {
+        background: #eff6ff;
+        border-color: #93c5fd;
+        color: #2563eb;
+      }
+
+      .check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 7px 20px 7px 36px;
+        transition: background 0.15s;
+        line-height: 1.45;
+        font-size: 0.875rem;
+      }
+
+      .check-item:hover {
+        background: #f8fafc;
+      }
+
+      .check-item.checked {
+        background: #eff6ff;
+      }
+
+      .check-item.checked .item-label {
+        color: #1d4ed8;
+      }
+
+      .check-item input[type="checkbox"] {
+        margin-top: 3px;
+        width: 16px;
+        height: 16px;
+        accent-color: #2563eb;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .item-label {
+        flex: 1;
+        cursor: text;
+        border-radius: 4px;
+        padding: 1px 4px;
+        margin: -1px -4px;
+      }
+
+      .item-label:hover {
+        background: rgba(148, 163, 184, 0.15);
+      }
+
+      .item-label-input {
+        flex: 1;
+        font: inherit;
+        line-height: inherit;
+        color: inherit;
+        border: 1px solid #93c5fd;
+        border-radius: 4px;
+        padding: 1px 6px;
+        margin: -2px -6px;
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+      }
+
+      .check-item.is-custom .item-label {
+        font-style: italic;
+      }
+
+      .toolbar {
+        padding: 8px 16px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+        background: #fafafa;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        font-family: inherit;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #fff;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .btn:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+      }
+
+      .toolbar .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .toolbar .btn-icon svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+      }
+
+      #btn-reset {
+        color: #dc2626;
+        border-width: 2px;
+        border-color: #fca5a5;
+        margin-left: auto;
+      }
+
+      #btn-reset:hover {
+        background: #fef2f2;
+        border-color: #f87171;
+        color: #b91c1c;
+      }
+
+      .tree-body {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        min-height: 0;
+      }
+
+      .empty-state {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #94a3b8;
+        padding: 24px;
+        max-width: none;
+      }
+
+      .empty-state svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+      }
+
+      .empty-state p {
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        max-width: 320px;
+      }
+
+      .tree-meta {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 400;
+      }
+
+      #tree-container {
+        position: absolute;
+        inset: 0;
+      }
+
+      #mindmap-el {
+        width: 100%;
+        height: 100%;
+      }
+
+      #mindmap-el .map-container {
+        font-family: "Inter", "Noto Sans JP", sans-serif;
+        background: #f8fafc;
+        cursor: grab;
+      }
+
+      #mindmap-el .map-container:active,
+      #mindmap-el .map-container.space-pressed {
+        cursor: grabbing;
+      }
+
+      .map-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .map-hint {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: 400;
+      }
+
+      .map-fab {
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        z-index: 20;
+        padding: 6px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(4px);
+      }
+
+      .btn-fab {
+        padding: 6px 12px;
+        font-size: 0.72rem;
+        white-space: nowrap;
+      }
+
+      .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        font-size: 1.15rem;
+        font-weight: 600;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn-icon svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>スライド作成チェックリスト</h1>
       </div>
-      <div id="mindmap-container" hidden></div>
+      <div class="progress">
+        <div class="progress-count">
+          <span id="checked-count">0</span> / <span id="total-count">0</span>
+        </div>
+        <div class="progress-label">チェック済み</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main" id="main-panels">
+      <section class="panel checklist-panel mode-check" id="checklist-panel">
+        <div class="panel-header checklist-panel-header">
+          <button
+            type="button"
+            class="btn-collapse-checklist"
+            id="btn-collapse-checklist"
+            aria-expanded="true"
+            aria-label="チェックリストを格納"
+            title="チェックリストを格納"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="4.5" y="5.5" width="15" height="13" rx="2.5" />
+              <line x1="9.5" y1="5.5" x2="9.5" y2="18.5" />
+            </svg>
+          </button>
+          <div class="mode-switch" id="mode-switch" role="group" aria-label="表示モード">
+            <button type="button" data-mode="check" class="is-active" aria-pressed="true">
+              チェック
+            </button>
+            <button type="button" data-mode="edit" aria-pressed="false">編集</button>
+            <button type="button" data-mode="edit-plus" aria-pressed="false">
+              編集+
+            </button>
+          </div>
+        </div>
+        <div class="checklist-panel-content">
+          <div class="checklist-body" id="checklist-root"></div>
+          <textarea
+            id="markdown-editor"
+            class="markdown-editor"
+            hidden
+            spellcheck="false"
+            aria-label="チェックリスト Markdown"
+          ></textarea>
+          <div class="toolbar">
+            <button class="btn" id="btn-check-all">すべてチェック</button>
+            <button class="btn" id="btn-uncheck-all">チェックを外す</button>
+            <button
+              class="btn btn-icon"
+              id="btn-reset"
+              type="button"
+              aria-label="リセット"
+              title="リセット"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                <path d="M3 21v-5h5" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div
+        class="panel-resizer"
+        id="panel-resizer"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="パネル幅を調整"
+        tabindex="0"
+      ></div>
+
+      <section class="panel tree-panel">
+        <div class="panel-header">
+          マインドマップ
+          <div class="map-controls">
+            <span class="map-hint">ドラッグ / スクロールで移動</span>
+            <span class="tree-meta" id="tree-meta">チェックした項目を表示</span>
+          </div>
+        </div>
+        <div class="tree-body" id="tree-body">
+          <div class="empty-state" id="empty-state">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+              <path
+                d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+              />
+            </svg>
+            <p>
+              チェックリストから項目を選ぶと、<br />中央「スライド作成」から左右に枝が伸びます。<br /><span
+                class="map-hint"
+                >ドラッグまたはスクロールで移動できます。</span
+              >
+            </p>
+          </div>
+          <div id="tree-container" hidden>
+            <div id="mindmap-el"></div>
+          </div>
+          <div class="map-fab" id="map-fab" hidden>
+            <button
+              class="btn btn-fab btn-icon"
+              id="btn-recenter"
+              type="button"
+              aria-label="中央に戻す"
+              title="中央に戻す"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="1.75"
+                  fill="currentColor"
+                  stroke="none"
+                />
+                <path d="M8 5H5v3" />
+                <path d="M16 5h3v3" />
+                <path d="M19 16v3h-3" />
+                <path d="M8 19H5v-3" />
+              </svg>
+            </button>
+            <button
+              class="btn btn-fab btn-icon"
+              id="btn-zoom-out"
+              type="button"
+              aria-label="縮小"
+            >
+              −
+            </button>
+            <button
+              class="btn btn-fab btn-icon"
+              id="btn-zoom-in"
+              type="button"
+              aria-label="拡大"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
-  </section>
-</div>
 
-<!-- チェックリスト.md の内容（デモ用に埋め込み。将来は fetch で読み込み可能） -->
-<script type="text/markdown" id="checklist-source">
-## 🔍 リサーチ
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-### 情報収集
+    <!-- チェックリスト.md の内容（デモ用に埋め込み。将来は fetch で読み込み可能） -->
+    <script type="text/markdown" id="checklist-source">
+      ## 🔍 リサーチ
 
-- [ ] 複数ツールで横断検索した
-- [ ] 出典ありで情報を取得した
-- [ ] 目的を先に渡してから調べさせた
-- [ ] キーワードを入れて検索代わりに使った
-- [ ] 調べた結果に「他にある？」と追加質問した
+      ### 情報収集
 
-### ファクト確認
+      - [ ] 複数ツールで横断検索した
+      - [ ] 出典ありで情報を取得した
+      - [ ] 目的を先に渡してから調べさせた
+      - [ ] キーワードを入れて検索代わりに使った
+      - [ ] 調べた結果に「他にある？」と追加質問した
 
-- [ ] AIの出力を鵜呑みにせず確認した
-- [ ] 一次情報に当たった
-- [ ] データの整合性を自分で確認した
-- [ ] 信頼できる出典かどうか自分で判断した
-- [ ] リサーチの問いを自分で設計してからAIに渡した
+      ### ファクト確認
 
----
+      - [ ] AIの出力を鵜呑みにせず確認した
+      - [ ] 一次情報に当たった
+      - [ ] データの整合性を自分で確認した
+      - [ ] 信頼できる出典かどうか自分で判断した
+      - [ ] リサーチの問いを自分で設計してからAIに渡した
 
-## 🗂 構成
+      ---
 
-### 主張設計
+      ## 🗂 構成
 
-- [ ] 1スライド1メッセージになっているか確認した
-- [ ] キーラインを1行で言えるようにAIと詰めた
-- [ ] 結論ファーストの構成で指示した
-- [ ] 主張を1行で書いてからAIに渡した
-- [ ] 「なぜそう思うのか」を自分で説明できる状態になった
+      ### 主張設計
 
-### 情報整理
+      - [ ] 1スライド1メッセージになっているか確認した
+      - [ ] キーラインを1行で言えるようにAIと詰めた
+      - [ ] 結論ファーストの構成で指示した
+      - [ ] 主張を1行で書いてからAIに渡した
+      - [ ] 「なぜそう思うのか」を自分で説明できる状態になった
 
-- [ ] 根拠を3点に絞って指示した
-- [ ] 不要な情報を捨てる判断をした
-- [ ] 文字数を制限して指示した
-- [ ] 情報の優先順位を自分で決めてからAIに渡した
-- [ ] 複数パターンの構成を出させて自分で選んだ
+      ### 情報整理
 
----
+      - [ ] 根拠を3点に絞って指示した
+      - [ ] 不要な情報を捨てる判断をした
+      - [ ] 文字数を制限して指示した
+      - [ ] 情報の優先順位を自分で決めてからAIに渡した
+      - [ ] 複数パターンの構成を出させて自分で選んだ
 
-## 🎨 デザイン
+      ---
 
-### カラー
+      ## 🎨 デザイン
 
-- [ ] 使う色を1〜2色に限定して指定した
-- [ ] 背景色を指定した
-- [ ] AIのデフォルト色をそのまま使わなかった
-- [ ] 「コンサルっぽく」「シンプルに」など方向性を言語化して渡した
-- [ ] 自分のデザインルールを先に文章で定義してから渡した
+      ### カラー
 
-### 配置・レイアウト
+      - [ ] 使う色を1〜2色に限定して指定した
+      - [ ] 背景色を指定した
+      - [ ] AIのデフォルト色をそのまま使わなかった
+      - [ ] 「コンサルっぽく」「シンプルに」など方向性を言語化して渡した
+      - [ ] 自分のデザインルールを先に文章で定義してから渡した
 
-- [ ] 左右の配置構造を指定した（例：左にキーメッセージ、右に根拠）
-- [ ] 余白を意識させる指示をした
-- [ ] 箇条書き禁止を指示した
-- [ ] レイアウト構造を言語化して指示した
-- [ ] 生成前にスライドの構成をAIと一緒に設計してから作った
+      ### 配置・レイアウト
 
-### タイポグラフィ
+      - [ ] 左右の配置構造を指定した（例：左にキーメッセージ、右に根拠）
+      - [ ] 余白を意識させる指示をした
+      - [ ] 箇条書き禁止を指示した
+      - [ ] レイアウト構造を言語化して指示した
+      - [ ] 生成前にスライドの構成をAIと一緒に設計してから作った
 
-- [ ] フォントを統一するよう指定した
-- [ ] 文字サイズを制限した
-- [ ] 見出しと本文を区別するよう指示した
-- [ ] 文字量の上限を具体的な数字で指定した
-- [ ] 体言止めを減らすよう指示した
+      ### タイポグラフィ
 
----
+      - [ ] フォントを統一するよう指定した
+      - [ ] 文字サイズを制限した
+      - [ ] 見出しと本文を区別するよう指示した
+      - [ ] 文字量の上限を具体的な数字で指定した
+      - [ ] 体言止めを減らすよう指示した
 
-## ✍️ プロンプト設計
+      ---
 
-### 指示設計
+      ## ✍️ プロンプト設計
 
-- [ ] 役割（「あなたは〇〇です」）を先に与えてから指示した
-- [ ] 出力形式（構成・文字数・レイアウト）を指定した
-- [ ] 制約条件（禁止事項・上限）を明示した
-- [ ] プロンプトにサンプル・例を入れて精度を上げた
-- [ ] 同じ指示を複数ツールに渡して出力を比べた
+      ### 指示設計
 
-### テンプレ化
+      - [ ] 役割（「あなたは〇〇です」）を先に与えてから指示した
+      - [ ] 出力形式（構成・文字数・レイアウト）を指定した
+      - [ ] 制約条件（禁止事項・上限）を明示した
+      - [ ] プロンプトにサンプル・例を入れて精度を上げた
+      - [ ] 同じ指示を複数ツールに渡して出力を比べた
 
-- [ ] 再現性のある形でプロンプトを保存した
-- [ ] 別のお題に同じプロンプトを転用した
-- [ ] AIにプロンプト自体を批評させて改善した
-- [ ] 失敗したプロンプトの原因を分析して改善した
-- [ ] 自分のプロンプトを誰かに共有して再現させた
+      ### テンプレ化
 
----
+      - [ ] 再現性のある形でプロンプトを保存した
+      - [ ] 別のお題に同じプロンプトを転用した
+      - [ ] AIにプロンプト自体を批評させて改善した
+      - [ ] 失敗したプロンプトの原因を分析して改善した
+      - [ ] 自分のプロンプトを誰かに共有して再現させた
 
-## ✅ 品質判断
+      ---
 
-- [ ] 生成後にAIに批評させて修正した
-- [ ] 改善点を自分の言葉で言語化できた
-- [ ] 複数パターンを生成して比較・選択した
-- [ ] 「なぜこの構成・デザインにしたか」を説明できた
-- [ ] AIが生成したスライドの問題点を即座に言語化できた
-</script>
+      ## ✅ 品質判断
 
-<script type="module">
-  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      - [ ] 生成後にAIに批評させて修正した
+      - [ ] 改善点を自分の言葉で言語化できた
+      - [ ] 複数パターンを生成して比較・選択した
+      - [ ] 「なぜこの構成・デザインにしたか」を説明できた
+      - [ ] AIが生成したスライドの問題点を即座に言語化できた
+    </script>
 
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'loose',
-    theme: 'base',
-    themeVariables: {
-      fontFamily: '"Inter", "Noto Sans JP", sans-serif',
-      primaryColor: '#ffffff',
-      primaryTextColor: '#334155',
-      primaryBorderColor: '#cbd5e1',
-      lineColor: '#94a3b8',
-      secondaryColor: '#f1f5f9',
-      tertiaryColor: '#ffffff'
-    }
-  });
+    <script type="module">
+      import MindElixir from "https://cdn.jsdelivr.net/npm/mind-elixir/dist/MindElixir.js";
 
-  const STORAGE_KEY = 'lm-ai-checklist-state';
-  let tree = [];
-  let renderId = 0;
+      const STORAGE_KEY = "lm-ai-checklist-state";
+      const SPLIT_STORAGE_KEY = "lm-ai-checklist-split-width";
+      const ROOT_LABEL = "スライド作成";
+      const DEFAULT_CHECKLIST_WIDTH = 380;
+      const MIN_CHECKLIST_WIDTH = 280;
+      const MIN_MAP_WIDTH = 200;
+      const NEW_ITEM_TEXT = "新しい項目";
+      let defaultTree = [];
+      let customItems = [];
+      let tree = [];
+      let mind = null;
+      let nodeSeq = 0;
+      let pendingEditId = null;
+      let checklistMode = "check";
+      let checklistCollapsed = false;
+      let widthBeforeCollapse = DEFAULT_CHECKLIST_WIDTH;
 
-  function parseMarkdown(md) {
-    const lines = md.trim().split('\n');
-    const categories = [];
-    let currentCategory = null;
-    let currentSub = null;
-
-    for (const raw of lines) {
-      const line = raw.trimEnd();
-      if (!line || line === '---') continue;
-
-      const h2 = line.match(/^## (.+)$/);
-      if (h2) {
-        currentCategory = { title: h2[1], subs: [], directItems: [] };
-        categories.push(currentCategory);
-        currentSub = null;
-        continue;
+      function isEditMode() {
+        return checklistMode === "edit";
       }
 
-      const h3 = line.match(/^### (.+)$/);
-      if (h3 && currentCategory) {
-        currentSub = { title: h3[1], items: [] };
-        currentCategory.subs.push(currentSub);
-        continue;
+      function updateModeUI() {
+        const panel = document.getElementById("checklist-panel");
+        const switcher = document.getElementById("mode-switch");
+        const editor = document.getElementById("markdown-editor");
+        if (!panel || !switcher) return;
+
+        panel.classList.toggle("mode-check", checklistMode === "check");
+        panel.classList.toggle("mode-edit", checklistMode === "edit");
+        panel.classList.toggle("mode-edit-plus", checklistMode === "edit-plus");
+
+        switcher.querySelectorAll("[data-mode]").forEach((btn) => {
+          const active = btn.dataset.mode === checklistMode;
+          btn.classList.toggle("is-active", active);
+          btn.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        if (editor) editor.hidden = checklistMode !== "edit-plus";
       }
 
-      const item = line.match(/^- \[([ xX])\] (.+)$/);
-      if (item && currentCategory) {
-        const entry = { id: '', text: item[2], checked: item[1].toLowerCase() === 'x' };
-        if (currentSub) {
-          currentSub.items.push(entry);
-        } else {
-          currentCategory.directItems.push(entry);
+      function setChecklistMode(mode) {
+        if (mode !== "check" && mode !== "edit" && mode !== "edit-plus") return;
+        if (checklistMode === mode) return;
+
+        if (checklistMode === "edit-plus" && mode !== "edit-plus") {
+          if (!applyMarkdownEditor()) return;
         }
-      }
-    }
 
-    let idx = 0;
-    for (const cat of categories) {
-      for (const sub of cat.subs) {
-        for (const item of sub.items) {
-          item.id = `item-${idx++}`;
+        if (mode === "edit-plus") {
+          const editor = document.getElementById("markdown-editor");
+          if (editor) editor.value = treeToMarkdown(tree);
         }
-      }
-      for (const item of cat.directItems) {
-        item.id = `item-${idx++}`;
-      }
-    }
 
-    return categories;
-  }
+        checklistMode = mode;
+        pendingEditId = null;
+        updateModeUI();
+        renderChecklist();
+      }
 
-  function loadState() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      for (const cat of tree) {
-        for (const sub of cat.subs) {
-          for (const item of sub.items) {
-            if (saved[item.id] !== undefined) item.checked = saved[item.id];
+      const TOAST_DURATION = 4000;
+      const TOAST_MAX_LINES = 5;
+
+      function showToast(errors) {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+
+        const lines = errors.map((e) =>
+          typeof e === "string" ? e : `${e.line}行目: ${e.message}`,
+        );
+
+        const toast = document.createElement("div");
+        toast.className = "toast is-error";
+
+        const title = document.createElement("div");
+        title.className = "toast-title";
+        title.textContent = `パースエラー（${lines.length}件）`;
+        toast.appendChild(title);
+
+        const body = document.createElement("div");
+        body.className = "toast-body";
+        lines.slice(0, TOAST_MAX_LINES).forEach((line) => {
+          const row = document.createElement("div");
+          row.textContent = line;
+          body.appendChild(row);
+        });
+        if (lines.length > TOAST_MAX_LINES) {
+          const more = document.createElement("div");
+          more.className = "toast-more";
+          more.textContent = `他 ${lines.length - TOAST_MAX_LINES} 件`;
+          body.appendChild(more);
+        }
+        toast.appendChild(body);
+        container.appendChild(toast);
+
+        requestAnimationFrame(() => toast.classList.add("is-visible"));
+        setTimeout(() => {
+          toast.classList.remove("is-visible");
+          setTimeout(() => toast.remove(), 300);
+        }, TOAST_DURATION);
+      }
+
+      function itemPathKey(catTitle, subTitle, itemText) {
+        return `${catTitle}|${subTitle || ""}|${itemText}`;
+      }
+
+      function buildCheckedPathMap(sourceTree) {
+        const map = new Map();
+        for (const cat of sourceTree) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) {
+              map.set(
+                itemPathKey(cat.title, sub.title, item.text),
+                item.checked,
+              );
+            }
+          }
+          for (const item of cat.directItems) {
+            map.set(itemPathKey(cat.title, "", item.text), item.checked);
           }
         }
-        for (const item of cat.directItems) {
-          if (saved[item.id] !== undefined) item.checked = saved[item.id];
+        return map;
+      }
+
+      function restoreCheckedByPath(sourceTree, checkedByPath) {
+        for (const cat of sourceTree) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) {
+              const key = itemPathKey(cat.title, sub.title, item.text);
+              if (checkedByPath.has(key)) item.checked = checkedByPath.get(key);
+            }
+          }
+          for (const item of cat.directItems) {
+            const key = itemPathKey(cat.title, "", item.text);
+            if (checkedByPath.has(key)) item.checked = checkedByPath.get(key);
+          }
         }
       }
-    } catch (_) { /* ignore */ }
-  }
 
-  function saveState() {
-    const state = {};
-    for (const cat of tree) {
-      for (const sub of cat.subs) {
-        for (const item of sub.items) state[item.id] = item.checked;
-      }
-      for (const item of cat.directItems) state[item.id] = item.checked;
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
+      function treeToMarkdown(sourceTree) {
+        const blocks = [];
+        for (let i = 0; i < sourceTree.length; i++) {
+          const cat = sourceTree[i];
+          const lines = [`## ${cat.title}`, ""];
 
-  function stripEmoji(title) {
-    return title.replace(/^[\s\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+/u, '').trim() || title;
-  }
+          for (const sub of cat.subs) {
+            lines.push(`### ${sub.title}`, "");
+            for (const item of sub.items) {
+              lines.push(
+                `- [${item.checked ? "x" : " "}] ${item.text}`,
+              );
+            }
+            lines.push("");
+          }
 
-  function escapeMermaid(text) {
-    return text
-      .replace(/"/g, '#quot;')
-      .replace(/\(/g, '#40;')
-      .replace(/\)/g, '#41;')
-      .replace(/\[/g, '#91;')
-      .replace(/\]/g, '#93;')
-      .replace(/</g, '#lt;')
-      .replace(/>/g, '#gt;')
-      .replace(/&/g, '#amp;')
-      .replace(/\n/g, ' ');
-  }
+          for (const item of cat.directItems) {
+            lines.push(`- [${item.checked ? "x" : " "}] ${item.text}`);
+          }
 
-  function buildMindmapSource() {
-    const branches = [];
-
-    for (const cat of tree) {
-      const catBranches = [];
-
-      for (const sub of cat.subs) {
-        const checked = sub.items.filter(i => i.checked);
-        if (checked.length === 0) continue;
-        const itemLines = checked.map(i => `        ${escapeMermaid(i.text)}`).join('\n');
-        catBranches.push(`      ${escapeMermaid(stripEmoji(sub.title))}\n${itemLines}`);
+          blocks.push(lines.join("\n").trimEnd());
+          if (i < sourceTree.length - 1) blocks.push("---");
+        }
+        return `${blocks.join("\n\n")}\n`;
       }
 
-      const directChecked = cat.directItems.filter(i => i.checked);
-      if (directChecked.length > 0) {
-        const itemLines = directChecked.map(i => `        ${escapeMermaid(i.text)}`).join('\n');
-        if (cat.subs.length === 0) {
-          catBranches.push(itemLines.replace(/^        /gm, '      '));
+      function assignItemIds(categories) {
+        let idx = 0;
+        for (const cat of categories) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) {
+              item.id = `item-${idx++}`;
+              item.source = "default";
+            }
+          }
+          for (const item of cat.directItems) {
+            item.id = `item-${idx++}`;
+            item.source = "default";
+          }
+        }
+      }
+
+      function parseMarkdownStrict(md) {
+        const rawLines = md.split("\n");
+        const categories = [];
+        const errors = [];
+        let currentCategory = null;
+        let currentSub = null;
+
+        for (let i = 0; i < rawLines.length; i++) {
+          const lineNum = i + 1;
+          const line = rawLines[i].trim();
+          if (!line || line === "---") continue;
+
+          const h2 = line.match(/^## (.+)$/);
+          if (h2) {
+            currentCategory = { title: h2[1], subs: [], directItems: [] };
+            categories.push(currentCategory);
+            currentSub = null;
+            continue;
+          }
+
+          const h3 = line.match(/^### (.+)$/);
+          if (h3) {
+            if (!currentCategory) {
+              errors.push({
+                line: lineNum,
+                message: "サブカテゴリ（###）の前に大カテゴリ（##）が必要です",
+              });
+              continue;
+            }
+            currentSub = { title: h3[1], items: [] };
+            currentCategory.subs.push(currentSub);
+            continue;
+          }
+
+          const item = line.match(/^- \[([ xX])\] (.+)$/);
+          if (item) {
+            if (!currentCategory) {
+              errors.push({
+                line: lineNum,
+                message: "チェック項目の前にカテゴリ（##）が必要です",
+              });
+              continue;
+            }
+            const entry = {
+              id: "",
+              text: item[2],
+              checked: item[1].toLowerCase() === "x",
+            };
+            if (currentSub) {
+              currentSub.items.push(entry);
+            } else {
+              currentCategory.directItems.push(entry);
+            }
+            continue;
+          }
+
+          if (/^-\s+\[/.test(line)) {
+            errors.push({
+              line: lineNum,
+              message: "チェックボックス形式が不正です（`- [ ]` または `- [x]`）",
+            });
+            continue;
+          }
+
+          if (/^-\s+/.test(line)) {
+            errors.push({
+              line: lineNum,
+              message: "チェックボックス形式が不正です（`- [ ]` または `- [x]`）",
+            });
+            continue;
+          }
+
+          errors.push({
+            line: lineNum,
+            message: `認識できない行「${line.length > 40 ? `${line.slice(0, 40)}…` : line}」`,
+          });
+        }
+
+        if (categories.length === 0 && errors.length === 0) {
+          errors.push({ line: 1, message: "チェックリストが空です" });
+        }
+
+        if (errors.length > 0) {
+          return { ok: false, categories: [], errors };
+        }
+
+        assignItemIds(categories);
+        return { ok: true, categories, errors: [] };
+      }
+
+      function applyMarkdownEditor() {
+        const editor = document.getElementById("markdown-editor");
+        if (!editor) return false;
+
+        const result = parseMarkdownStrict(editor.value);
+        if (!result.ok) {
+          showToast(result.errors);
+          return false;
+        }
+
+        const checkedByPath = buildCheckedPathMap(tree);
+        defaultTree = result.categories;
+        customItems = [];
+        tree = cloneTree(defaultTree);
+        restoreCheckedByPath(tree, checkedByPath);
+        saveState();
+        updateProgress();
+        renderTree();
+        return true;
+      }
+
+      function canCollapseChecklist() {
+        return !window.matchMedia("(max-width: 900px)").matches;
+      }
+
+      function updateCollapsedWidth() {
+        const panel = document.getElementById("checklist-panel");
+        const btn = document.getElementById("btn-collapse-checklist");
+        const header = panel?.querySelector(".checklist-panel-header");
+        if (!panel || !btn || !header) return;
+
+        const style = getComputedStyle(header);
+        const paddingX =
+          parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+        const width = btn.offsetWidth + paddingX + 4;
+        document.documentElement.style.setProperty(
+          "--checklist-collapsed-width",
+          `${Math.ceil(width)}px`,
+        );
+      }
+
+      function updateCollapseButtonUI() {
+        const btn = document.getElementById("btn-collapse-checklist");
+        if (!btn) return;
+        btn.setAttribute(
+          "aria-expanded",
+          checklistCollapsed ? "false" : "true",
+        );
+        btn.title = checklistCollapsed
+          ? "チェックリストを表示"
+          : "チェックリストを格納";
+        btn.setAttribute("aria-label", btn.title);
+      }
+
+      function setChecklistCollapsed(collapsed) {
+        if (collapsed === checklistCollapsed) return;
+        if (collapsed && !canCollapseChecklist()) return;
+
+        const panel = document.getElementById("checklist-panel");
+        const main = document.getElementById("main-panels");
+        if (!panel || !main) return;
+
+        if (collapsed) {
+          widthBeforeCollapse =
+            parseInt(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--checklist-width",
+              ),
+              10,
+            ) || DEFAULT_CHECKLIST_WIDTH;
+          pendingEditId = null;
+          checklistCollapsed = true;
+          panel.classList.add("is-collapsed");
+          main.classList.add("is-checklist-collapsed");
+          requestAnimationFrame(() => {
+            updateCollapsedWidth();
+            if (mind) mind.toCenter();
+          });
         } else {
-          catBranches.push(`      ${escapeMermaid(stripEmoji(cat.title))}項目\n${itemLines}`);
+          checklistCollapsed = false;
+          panel.classList.remove("is-collapsed");
+          main.classList.remove("is-checklist-collapsed");
+          if (canCollapseChecklist())
+            setChecklistWidth(widthBeforeCollapse, true);
+          renderChecklist();
+          requestAnimationFrame(() => {
+            if (mind) mind.toCenter();
+          });
+        }
+
+        updateCollapseButtonUI();
+      }
+
+      function toggleChecklistCollapse() {
+        setChecklistCollapsed(!checklistCollapsed);
+      }
+
+      const MAP_THEME = {
+        name: "SlideChecklist",
+        palette: [
+          "#e64553",
+          "#fe640b",
+          "#df8e1d",
+          "#40a02b",
+          "#209fb5",
+          "#1e66f5",
+          "#7287fd",
+          "#8839ef",
+          "#ea76cb",
+        ],
+        cssVar: {
+          "--main-color": "#444446",
+          "--main-bgcolor": "#ffffff",
+          "--color": "#555555",
+          "--bgcolor": "#f8fafc",
+          "--root-color": "#ffffff",
+          "--root-bgcolor": "#4c5898",
+          "--root-border-color": "#4c5898",
+        },
+      };
+
+      function parseMarkdown(md) {
+        const result = parseMarkdownStrict(md);
+        return result.ok ? result.categories : [];
+      }
+
+      function cloneTree(source) {
+        return JSON.parse(JSON.stringify(source));
+      }
+
+      function initDefaultTree() {
+        defaultTree = parseMarkdown(
+          document.getElementById("checklist-source").textContent,
+        );
+      }
+
+      function getCheckedMap() {
+        const map = new Map();
+        for (const cat of tree) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) map.set(item.id, item.checked);
+          }
+          for (const item of cat.directItems) map.set(item.id, item.checked);
+        }
+        return map;
+      }
+
+      function resolveTree() {
+        const checkedMap = getCheckedMap();
+        const edits = customItems.filter((c) => c.action === "edit");
+        const editMap = new Map(edits.map((e) => [e.id, e.text]));
+        const adds = customItems.filter((c) => c.action === "add");
+
+        tree = cloneTree(defaultTree);
+
+        for (const cat of tree) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) {
+              if (editMap.has(item.id)) item.text = editMap.get(item.id);
+              if (checkedMap.has(item.id))
+                item.checked = checkedMap.get(item.id);
+            }
+          }
+          for (const item of cat.directItems) {
+            if (editMap.has(item.id)) item.text = editMap.get(item.id);
+            if (checkedMap.has(item.id)) item.checked = checkedMap.get(item.id);
+          }
+        }
+
+        for (const add of adds) {
+          const cat = tree.find((c) => c.title === add.catTitle);
+          const sub = cat?.subs.find((s) => s.title === add.subTitle);
+          if (!sub) continue;
+          sub.items.push({
+            id: add.id,
+            text: add.text,
+            checked: checkedMap.get(add.id) ?? add.checked ?? false,
+            source: "custom",
+          });
         }
       }
 
-      if (catBranches.length > 0) {
-        branches.push(`    ${escapeMermaid(stripEmoji(cat.title))}\n${catBranches.join('\n')}`);
-      }
-    }
-
-    if (branches.length === 0) return null;
-
-    return `mindmap
-  root((チェック済み))
-${branches.join('\n')}`;
-  }
-
-  async function renderMindmap() {
-    const container = document.getElementById('mindmap-container');
-    const empty = document.getElementById('empty-state');
-    const meta = document.getElementById('mindmap-meta');
-    const source = buildMindmapSource();
-
-    if (!source) {
-      container.hidden = true;
-      container.innerHTML = '';
-      empty.hidden = false;
-      meta.textContent = 'チェックした項目を表示';
-      return;
-    }
-
-    empty.hidden = true;
-    container.hidden = false;
-
-    const id = `mm-${++renderId}`;
-    container.innerHTML = `<pre class="mermaid" id="${id}">${source}</pre>`;
-
-    const checkedTotal = countChecked();
-    meta.textContent = `${checkedTotal} 項目をマップに反映`;
-
-    try {
-      await mermaid.run({ nodes: [document.getElementById(id)] });
-    } catch (err) {
-      console.error(err);
-      container.innerHTML = `<p style="color:#dc2626;padding:20px;">マインドマップの生成に失敗しました。</p>`;
-    }
-  }
-
-  function countChecked() {
-    let n = 0;
-    for (const cat of tree) {
-      for (const sub of cat.subs) n += sub.items.filter(i => i.checked).length;
-      n += cat.directItems.filter(i => i.checked).length;
-    }
-    return n;
-  }
-
-  function countTotal() {
-    let n = 0;
-    for (const cat of tree) {
-      for (const sub of cat.subs) n += sub.items.length;
-      n += cat.directItems.length;
-    }
-    return n;
-  }
-
-  function updateProgress() {
-    const checked = countChecked();
-    const total = countTotal();
-    document.getElementById('checked-count').textContent = checked;
-    document.getElementById('total-count').textContent = total;
-    document.getElementById('progress-fill').style.width = total ? `${(checked / total) * 100}%` : '0%';
-  }
-
-  function onToggle() {
-    saveState();
-    updateProgress();
-    renderMindmap();
-  }
-
-  function renderChecklist() {
-    const root = document.getElementById('checklist-root');
-    root.innerHTML = '';
-
-    for (const cat of tree) {
-      const catEl = document.createElement('div');
-      catEl.className = 'category';
-
-      const catTitle = document.createElement('div');
-      catTitle.className = 'category-title';
-      catTitle.textContent = cat.title;
-      catEl.appendChild(catTitle);
-
-      for (const sub of cat.subs) {
-        const subEl = document.createElement('div');
-        subEl.className = 'subcategory';
-
-        const subTitle = document.createElement('div');
-        subTitle.className = 'subcategory-title';
-        subTitle.textContent = sub.title;
-        subEl.appendChild(subTitle);
-
-        for (const item of sub.items) {
-          subEl.appendChild(createCheckItem(item));
+      function findItemById(id) {
+        for (const cat of tree) {
+          for (const sub of cat.subs) {
+            const item = sub.items.find((i) => i.id === id);
+            if (item) return item;
+          }
+          const direct = cat.directItems.find((i) => i.id === id);
+          if (direct) return direct;
         }
-        catEl.appendChild(subEl);
+        return null;
       }
 
-      for (const item of cat.directItems) {
-        catEl.appendChild(createCheckItem(item));
+      function applyItemEdit(item, newText) {
+        if (item.source === "custom") {
+          const add = customItems.find(
+            (c) => c.action === "add" && c.id === item.id,
+          );
+          if (add) add.text = newText;
+        } else {
+          const idx = customItems.findIndex(
+            (c) => c.action === "edit" && c.id === item.id,
+          );
+          if (idx >= 0) customItems[idx].text = newText;
+          else customItems.push({ action: "edit", id: item.id, text: newText });
+        }
+        syncChecklistView();
       }
 
-      root.appendChild(catEl);
-    }
-  }
+      function addItemToSub(catTitle, subTitle) {
+        if (!isEditMode()) return;
+        const id = `custom-${crypto.randomUUID()}`;
+        customItems.push({
+          action: "add",
+          id,
+          catTitle,
+          subTitle,
+          text: NEW_ITEM_TEXT,
+          checked: false,
+        });
+        pendingEditId = id;
+        syncChecklistView();
+      }
 
-  function createCheckItem(item) {
-    const label = document.createElement('label');
-    label.className = 'check-item' + (item.checked ? ' checked' : '');
+      function syncChecklistView() {
+        resolveTree();
+        renderChecklist();
+        updateProgress();
+        renderTree();
+      }
 
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = item.checked;
-    cb.addEventListener('change', () => {
-      item.checked = cb.checked;
-      label.classList.toggle('checked', item.checked);
-      onToggle();
-    });
+      function loadState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+          for (const cat of tree) {
+            for (const sub of cat.subs) {
+              for (const item of sub.items) {
+                if (saved[item.id] !== undefined) item.checked = saved[item.id];
+              }
+            }
+            for (const item of cat.directItems) {
+              if (saved[item.id] !== undefined) item.checked = saved[item.id];
+            }
+          }
+        } catch (_) {
+          /* ignore */
+        }
+      }
 
-    const span = document.createElement('span');
-    span.className = 'item-label';
-    span.textContent = item.text;
+      function saveState() {
+        const state = {};
+        for (const cat of tree) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) state[item.id] = item.checked;
+          }
+          for (const item of cat.directItems) state[item.id] = item.checked;
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
 
-    label.appendChild(cb);
-    label.appendChild(span);
-    return label;
-  }
+      function stripEmoji(title) {
+        return (
+          title
+            .replace(
+              /^[\s\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+/u,
+              "",
+            )
+            .trim() || title
+        );
+      }
 
-  function setAll(checked) {
-    for (const cat of tree) {
-      for (const sub of cat.subs) sub.items.forEach(i => { i.checked = checked; });
-      cat.directItems.forEach(i => { i.checked = checked; });
-    }
-    renderChecklist();
-    onToggle();
-  }
+      function nextNodeId(prefix = "n") {
+        nodeSeq += 1;
+        return `${prefix}-${nodeSeq}`;
+      }
 
-  document.getElementById('btn-check-all').addEventListener('click', () => setAll(true));
-  document.getElementById('btn-uncheck-all').addEventListener('click', () => setAll(false));
-  document.getElementById('btn-reset').addEventListener('click', () => {
-    localStorage.removeItem(STORAGE_KEY);
-    tree = parseMarkdown(document.getElementById('checklist-source').textContent);
-    renderChecklist();
-    onToggle();
-  });
+      function getActiveCategories() {
+        const active = [];
+        for (const cat of tree) {
+          const subs = [];
+          for (const sub of cat.subs) {
+            const checked = sub.items.filter((i) => i.checked);
+            if (checked.length) subs.push({ title: sub.title, items: checked });
+          }
+          const directItems = cat.directItems.filter((i) => i.checked);
+          if (subs.length || directItems.length) {
+            active.push({ title: cat.title, subs, directItems });
+          }
+        }
+        return active;
+      }
 
-  tree = parseMarkdown(document.getElementById('checklist-source').textContent);
-  loadState();
-  renderChecklist();
-  updateProgress();
-  renderMindmap();
-</script>
+      function buildMindData() {
+        nodeSeq = 0;
+        const active = getActiveCategories();
+        if (active.length === 0) return null;
 
-</body>
+        const children = active.map((cat) => {
+          const catNode = {
+            id: nextNodeId("cat"),
+            topic: stripEmoji(cat.title),
+            children: [],
+          };
+
+          for (const sub of cat.subs) {
+            catNode.children.push({
+              id: nextNodeId("sub"),
+              topic: stripEmoji(sub.title),
+              children: sub.items.map((item) => ({
+                id: item.id,
+                topic: item.text,
+              })),
+            });
+          }
+
+          for (const item of cat.directItems) {
+            catNode.children.push({
+              id: item.id,
+              topic: item.text,
+            });
+          }
+
+          return catNode;
+        });
+
+        return {
+          nodeData: {
+            id: "root",
+            topic: ROOT_LABEL,
+            root: true,
+            expanded: true,
+            children,
+          },
+        };
+      }
+
+      function createMindInstance() {
+        return new MindElixir({
+          el: "#mindmap-el",
+          direction: MindElixir.SIDE,
+          editable: false,
+          draggable: false,
+          contextMenu: false,
+          toolBar: false,
+          nodeMenu: false,
+          keypress: false,
+          locale: "ja",
+          overflowHidden: false,
+          handleWheel: true,
+          mainLinkStyle: 2,
+          theme: MAP_THEME,
+        });
+      }
+
+      function destroyMind() {
+        if (mind) {
+          mind.destroy();
+          mind = null;
+        }
+        document.getElementById("mindmap-el").innerHTML = "";
+      }
+
+      function setMapFabVisible(visible) {
+        document.getElementById("map-fab").hidden = !visible;
+      }
+
+      function zoomIn() {
+        if (!mind) return;
+        mind.scale(mind.scaleVal + mind.scaleSensitivity);
+      }
+
+      function zoomOut() {
+        if (!mind) return;
+        mind.scale(mind.scaleVal - mind.scaleSensitivity);
+      }
+
+      function renderTree() {
+        const container = document.getElementById("tree-container");
+        const empty = document.getElementById("empty-state");
+        const meta = document.getElementById("tree-meta");
+        const data = buildMindData();
+
+        if (!data) {
+          container.hidden = true;
+          empty.hidden = false;
+          meta.textContent = "チェックした項目を表示";
+          setMapFabVisible(false);
+          destroyMind();
+          return;
+        }
+
+        empty.hidden = true;
+        container.hidden = false;
+        setMapFabVisible(true);
+
+        const isFirstRender = !mind;
+        if (isFirstRender) {
+          mind = createMindInstance();
+          mind.init(data);
+          mind.toCenter();
+        } else {
+          mind.refresh(data);
+        }
+
+        meta.textContent = `${countChecked()} 項目をマップに反映`;
+      }
+
+      function countChecked() {
+        let n = 0;
+        for (const cat of tree) {
+          for (const sub of cat.subs)
+            n += sub.items.filter((i) => i.checked).length;
+          n += cat.directItems.filter((i) => i.checked).length;
+        }
+        return n;
+      }
+
+      function countTotal() {
+        let n = 0;
+        for (const cat of tree) {
+          for (const sub of cat.subs) n += sub.items.length;
+          n += cat.directItems.length;
+        }
+        return n;
+      }
+
+      function updateProgress() {
+        const checked = countChecked();
+        const total = countTotal();
+        document.getElementById("checked-count").textContent = checked;
+        document.getElementById("total-count").textContent = total;
+        document.getElementById("progress-fill").style.width = total
+          ? `${(checked / total) * 100}%`
+          : "0%";
+      }
+
+      function onToggle() {
+        saveState();
+        updateProgress();
+        renderTree();
+      }
+
+      function renderChecklist() {
+        const root = document.getElementById("checklist-root");
+        root.innerHTML = "";
+
+        for (const cat of tree) {
+          const catEl = document.createElement("div");
+          catEl.className = "category";
+
+          const catTitle = document.createElement("div");
+          catTitle.className = "category-title";
+          catTitle.textContent = cat.title;
+          catEl.appendChild(catTitle);
+
+          for (const sub of cat.subs) {
+            const subEl = document.createElement("div");
+            subEl.className = "subcategory";
+
+            const subHeader = document.createElement("div");
+            subHeader.className = "subcategory-header";
+
+            const subTitle = document.createElement("div");
+            subTitle.className = "subcategory-title";
+            subTitle.textContent = sub.title;
+
+            const addBtn = document.createElement("button");
+            addBtn.type = "button";
+            addBtn.className = "btn-add-item";
+            addBtn.title = "項目を追加";
+            addBtn.setAttribute("aria-label", `${sub.title}に項目を追加`);
+            addBtn.textContent = "+";
+            addBtn.addEventListener("click", () =>
+              addItemToSub(cat.title, sub.title),
+            );
+
+            subHeader.appendChild(subTitle);
+            subHeader.appendChild(addBtn);
+            subEl.appendChild(subHeader);
+
+            for (const item of sub.items) {
+              subEl.appendChild(createCheckItem(item));
+            }
+            catEl.appendChild(subEl);
+          }
+
+          for (const item of cat.directItems) {
+            catEl.appendChild(createCheckItem(item));
+          }
+
+          root.appendChild(catEl);
+        }
+
+        if (pendingEditId && isEditMode()) {
+          const editId = pendingEditId;
+          pendingEditId = null;
+          const row = root.querySelector(`[data-item-id="${editId}"]`);
+          const item = findItemById(editId);
+          const labelEl = row?.querySelector(".item-label");
+          if (row && item && labelEl) startLabelEdit(row, item, labelEl);
+        }
+      }
+
+      function startLabelEdit(row, item, span) {
+        if (!isEditMode()) return;
+        if (row.querySelector(".item-label-input")) return;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "item-label-input";
+        input.value = item.text;
+
+        const originalText = item.text;
+        let committed = false;
+
+        const finish = (save) => {
+          if (committed) return;
+          committed = true;
+          const newText = input.value.trim();
+          if (save && newText && newText !== originalText) {
+            applyItemEdit(item, newText);
+          } else {
+            renderChecklist();
+          }
+        };
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            finish(true);
+          }
+          if (e.key === "Escape") {
+            e.preventDefault();
+            finish(false);
+          }
+        });
+        input.addEventListener("blur", () => finish(true));
+
+        span.replaceWith(input);
+        input.focus();
+        input.select();
+      }
+
+      function setItemChecked(item, row, cb, checked) {
+        item.checked = checked;
+        cb.checked = checked;
+        const add = customItems.find(
+          (c) => c.action === "add" && c.id === item.id,
+        );
+        if (add) add.checked = checked;
+        row.classList.toggle("checked", checked);
+        onToggle();
+      }
+
+      function createCheckItem(item) {
+        const row = document.createElement("div");
+        row.className =
+          "check-item" +
+          (item.checked ? " checked" : "") +
+          (item.source === "custom" ? " is-custom" : "");
+        row.dataset.itemId = item.id;
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = item.checked;
+        cb.addEventListener("change", () => {
+          setItemChecked(item, row, cb, cb.checked);
+        });
+        cb.addEventListener("click", (e) => e.stopPropagation());
+
+        const span = document.createElement("span");
+        span.className = "item-label";
+        span.textContent = item.text;
+        if (isEditMode()) {
+          span.title = "クリックで編集";
+          span.addEventListener("click", (e) => {
+            e.stopPropagation();
+            startLabelEdit(row, item, span);
+          });
+        } else {
+          row.addEventListener("click", () => {
+            setItemChecked(item, row, cb, !item.checked);
+          });
+        }
+
+        row.appendChild(cb);
+        row.appendChild(span);
+        return row;
+      }
+
+      function setAll(checked) {
+        for (const cat of tree) {
+          for (const sub of cat.subs) {
+            for (const item of sub.items) {
+              item.checked = checked;
+              const add = customItems.find(
+                (c) => c.action === "add" && c.id === item.id,
+              );
+              if (add) add.checked = checked;
+            }
+          }
+          for (const item of cat.directItems) {
+            item.checked = checked;
+          }
+        }
+        renderChecklist();
+        onToggle();
+      }
+
+      document
+        .getElementById("btn-check-all")
+        .addEventListener("click", () => setAll(true));
+      document
+        .getElementById("btn-uncheck-all")
+        .addEventListener("click", () => setAll(false));
+      document
+        .getElementById("btn-collapse-checklist")
+        .addEventListener("click", toggleChecklistCollapse);
+      document.getElementById("mode-switch").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-mode]");
+        if (btn) setChecklistMode(btn.dataset.mode);
+      });
+      document.getElementById("btn-recenter").addEventListener("click", () => {
+        if (mind) mind.toCenter();
+      });
+      document.getElementById("btn-zoom-in").addEventListener("click", zoomIn);
+      document
+        .getElementById("btn-zoom-out")
+        .addEventListener("click", zoomOut);
+      function getMaxChecklistWidth() {
+        const main = document.getElementById("main-panels");
+        if (!main) return DEFAULT_CHECKLIST_WIDTH;
+        return Math.max(
+          MIN_CHECKLIST_WIDTH,
+          main.clientWidth - MIN_MAP_WIDTH - 6,
+        );
+      }
+
+      function setChecklistWidth(width, persist = true) {
+        if (checklistCollapsed && canCollapseChecklist())
+          return widthBeforeCollapse;
+        const max = getMaxChecklistWidth();
+        const next = Math.max(MIN_CHECKLIST_WIDTH, Math.min(width, max));
+        document.documentElement.style.setProperty(
+          "--checklist-width",
+          `${next}px`,
+        );
+        if (persist)
+          localStorage.setItem(SPLIT_STORAGE_KEY, String(Math.round(next)));
+        return next;
+      }
+
+      function initPanelResizer() {
+        const main = document.getElementById("main-panels");
+        const resizer = document.getElementById("panel-resizer");
+        if (
+          !main ||
+          !resizer ||
+          window.matchMedia("(max-width: 900px)").matches
+        )
+          return;
+
+        const saved = parseInt(
+          localStorage.getItem(SPLIT_STORAGE_KEY) || "",
+          10,
+        );
+        setChecklistWidth(
+          Number.isFinite(saved) ? saved : DEFAULT_CHECKLIST_WIDTH,
+          true,
+        );
+
+        let dragging = false;
+
+        const stopDrag = () => {
+          if (!dragging) return;
+          dragging = false;
+          resizer.classList.remove("is-dragging");
+          document.body.classList.remove("is-resizing-panels");
+          if (mind) mind.toCenter();
+        };
+
+        const onMove = (clientX) => {
+          const rect = main.getBoundingClientRect();
+          setChecklistWidth(clientX - rect.left, true);
+        };
+
+        resizer.addEventListener("mousedown", (e) => {
+          if (e.button !== 0 || checklistCollapsed) return;
+          e.preventDefault();
+          dragging = true;
+          resizer.classList.add("is-dragging");
+          document.body.classList.add("is-resizing-panels");
+        });
+
+        resizer.addEventListener("dblclick", () => {
+          setChecklistWidth(DEFAULT_CHECKLIST_WIDTH, true);
+          if (mind) mind.toCenter();
+        });
+
+        resizer.addEventListener("keydown", (e) => {
+          const step = e.shiftKey ? 40 : 16;
+          const current =
+            parseInt(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--checklist-width",
+              ),
+              10,
+            ) || DEFAULT_CHECKLIST_WIDTH;
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            setChecklistWidth(current - step, true);
+          }
+          if (e.key === "ArrowRight") {
+            e.preventDefault();
+            setChecklistWidth(current + step, true);
+          }
+          if (e.key === "Home") {
+            e.preventDefault();
+            setChecklistWidth(DEFAULT_CHECKLIST_WIDTH, true);
+          }
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!dragging) return;
+          onMove(e.clientX);
+        });
+        document.addEventListener("mouseup", stopDrag);
+        window.addEventListener("resize", () => {
+          if (checklistCollapsed) {
+            updateCollapsedWidth();
+            return;
+          }
+          const current =
+            parseInt(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--checklist-width",
+              ),
+              10,
+            ) || DEFAULT_CHECKLIST_WIDTH;
+          setChecklistWidth(current, false);
+        });
+      }
+
+      window.addEventListener("resize", () => {
+        if (checklistCollapsed && !canCollapseChecklist()) {
+          setChecklistCollapsed(false);
+        }
+      });
+
+      document.getElementById("btn-reset").addEventListener("click", () => {
+        const confirmed = window.confirm(
+          "チェック状態と編集内容をすべて消し、初期状態に戻します。よろしいですか？",
+        );
+        if (!confirmed) return;
+
+        localStorage.removeItem(STORAGE_KEY);
+        customItems = [];
+        pendingEditId = null;
+        initDefaultTree();
+        resolveTree();
+        loadState();
+        renderChecklist();
+        onToggle();
+      });
+
+      initDefaultTree();
+      resolveTree();
+      loadState();
+      updateModeUI();
+      updateCollapseButtonUI();
+      renderChecklist();
+      updateProgress();
+      renderTree();
+      initPanelResizer();
+    </script>
+  </body>
 </html>

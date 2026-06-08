@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スライド作成チェックリスト — マインドマップ</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .app-header {
+    padding: 16px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .app-header h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .app-header p {
+    margin: 4px 0 0;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  .progress {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .progress-count {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2563eb;
+  }
+
+  .progress-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .progress-bar {
+    width: 120px;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(320px, 420px) 1fr;
+    min-height: 0;
+  }
+
+  @media (max-width: 900px) {
+    body { height: auto; overflow: auto; }
+    .main { grid-template-columns: 1fr; grid-template-rows: auto 60vh; }
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .panel-header span {
+    font-weight: 400;
+    color: #94a3b8;
+    font-size: 0.75rem;
+  }
+
+  .checklist-panel {
+    border-right: 1px solid #e2e8f0;
+    background: #fff;
+  }
+
+  .checklist-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0 24px;
+  }
+
+  .category {
+    margin-top: 8px;
+  }
+
+  .category-title {
+    padding: 10px 20px 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    z-index: 1;
+  }
+
+  .subcategory {
+    margin-left: 0;
+  }
+
+  .subcategory-title {
+    padding: 6px 20px 4px 28px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 20px 7px 36px;
+    cursor: pointer;
+    transition: background 0.15s;
+    line-height: 1.45;
+    font-size: 0.875rem;
+  }
+
+  .check-item:hover { background: #f8fafc; }
+
+  .check-item.checked {
+    background: #eff6ff;
+  }
+
+  .check-item.checked .item-label {
+    color: #1d4ed8;
+  }
+
+  .check-item input[type="checkbox"] {
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+    accent-color: #2563eb;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .item-label { flex: 1; }
+
+  .toolbar {
+    padding: 8px 16px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    background: #fafafa;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-family: inherit;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+  }
+
+  .mindmap-panel {
+    background: #f8fafc;
+  }
+
+  .mindmap-body {
+    flex: 1;
+    overflow: auto;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #94a3b8;
+    padding: 60px 24px;
+    max-width: 320px;
+  }
+
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  #mindmap-container .mermaid svg {
+    min-width: 900px;
+    max-width: none !important;
+    height: auto !important;
+  }
+
+  .mindmap-meta {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 400;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1>スライド作成チェックリスト</h1>
+    <p>左でチェック → 右のマインドマップに反映（デモ）</p>
+  </div>
+  <div class="progress">
+    <div class="progress-count"><span id="checked-count">0</span> / <span id="total-count">0</span></div>
+    <div class="progress-label">チェック済み</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="main">
+  <section class="panel checklist-panel">
+    <div class="panel-header">
+      チェックリスト
+      <span>チェックリスト.md より</span>
+    </div>
+    <div class="checklist-body" id="checklist-root"></div>
+    <div class="toolbar">
+      <button class="btn" id="btn-check-all">すべてチェック</button>
+      <button class="btn" id="btn-uncheck-all">すべて解除</button>
+      <button class="btn" id="btn-reset">リセット</button>
+    </div>
+  </section>
+
+  <section class="panel mindmap-panel">
+    <div class="panel-header">
+      マインドマップ
+      <span class="mindmap-meta" id="mindmap-meta">チェックした項目を表示</span>
+    </div>
+    <div class="mindmap-body" id="mindmap-body">
+      <div class="empty-state" id="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+          <path d="M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        </svg>
+        <p>チェックリストから項目を選ぶと、<br>ここにマインドマップが生成されます。</p>
+      </div>
+      <div id="mindmap-container" hidden></div>
+    </div>
+  </section>
+</div>
+
+<!-- チェックリスト.md の内容（デモ用に埋め込み。将来は fetch で読み込み可能） -->
+<script type="text/markdown" id="checklist-source">
+## 🔍 リサーチ
+
+### 情報収集
+
+- [ ] 複数ツールで横断検索した
+- [ ] 出典ありで情報を取得した
+- [ ] 目的を先に渡してから調べさせた
+- [ ] キーワードを入れて検索代わりに使った
+- [ ] 調べた結果に「他にある？」と追加質問した
+
+### ファクト確認
+
+- [ ] AIの出力を鵜呑みにせず確認した
+- [ ] 一次情報に当たった
+- [ ] データの整合性を自分で確認した
+- [ ] 信頼できる出典かどうか自分で判断した
+- [ ] リサーチの問いを自分で設計してからAIに渡した
+
+---
+
+## 🗂 構成
+
+### 主張設計
+
+- [ ] 1スライド1メッセージになっているか確認した
+- [ ] キーラインを1行で言えるようにAIと詰めた
+- [ ] 結論ファーストの構成で指示した
+- [ ] 主張を1行で書いてからAIに渡した
+- [ ] 「なぜそう思うのか」を自分で説明できる状態になった
+
+### 情報整理
+
+- [ ] 根拠を3点に絞って指示した
+- [ ] 不要な情報を捨てる判断をした
+- [ ] 文字数を制限して指示した
+- [ ] 情報の優先順位を自分で決めてからAIに渡した
+- [ ] 複数パターンの構成を出させて自分で選んだ
+
+---
+
+## 🎨 デザイン
+
+### カラー
+
+- [ ] 使う色を1〜2色に限定して指定した
+- [ ] 背景色を指定した
+- [ ] AIのデフォルト色をそのまま使わなかった
+- [ ] 「コンサルっぽく」「シンプルに」など方向性を言語化して渡した
+- [ ] 自分のデザインルールを先に文章で定義してから渡した
+
+### 配置・レイアウト
+
+- [ ] 左右の配置構造を指定した（例：左にキーメッセージ、右に根拠）
+- [ ] 余白を意識させる指示をした
+- [ ] 箇条書き禁止を指示した
+- [ ] レイアウト構造を言語化して指示した
+- [ ] 生成前にスライドの構成をAIと一緒に設計してから作った
+
+### タイポグラフィ
+
+- [ ] フォントを統一するよう指定した
+- [ ] 文字サイズを制限した
+- [ ] 見出しと本文を区別するよう指示した
+- [ ] 文字量の上限を具体的な数字で指定した
+- [ ] 体言止めを減らすよう指示した
+
+---
+
+## ✍️ プロンプト設計
+
+### 指示設計
+
+- [ ] 役割（「あなたは〇〇です」）を先に与えてから指示した
+- [ ] 出力形式（構成・文字数・レイアウト）を指定した
+- [ ] 制約条件（禁止事項・上限）を明示した
+- [ ] プロンプトにサンプル・例を入れて精度を上げた
+- [ ] 同じ指示を複数ツールに渡して出力を比べた
+
+### テンプレ化
+
+- [ ] 再現性のある形でプロンプトを保存した
+- [ ] 別のお題に同じプロンプトを転用した
+- [ ] AIにプロンプト自体を批評させて改善した
+- [ ] 失敗したプロンプトの原因を分析して改善した
+- [ ] 自分のプロンプトを誰かに共有して再現させた
+
+---
+
+## ✅ 品質判断
+
+- [ ] 生成後にAIに批評させて修正した
+- [ ] 改善点を自分の言葉で言語化できた
+- [ ] 複数パターンを生成して比較・選択した
+- [ ] 「なぜこの構成・デザインにしたか」を説明できた
+- [ ] AIが生成したスライドの問題点を即座に言語化できた
+</script>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: 'base',
+    themeVariables: {
+      fontFamily: '"Inter", "Noto Sans JP", sans-serif',
+      primaryColor: '#ffffff',
+      primaryTextColor: '#334155',
+      primaryBorderColor: '#cbd5e1',
+      lineColor: '#94a3b8',
+      secondaryColor: '#f1f5f9',
+      tertiaryColor: '#ffffff'
+    }
+  });
+
+  const STORAGE_KEY = 'lm-ai-checklist-state';
+  let tree = [];
+  let renderId = 0;
+
+  function parseMarkdown(md) {
+    const lines = md.trim().split('\n');
+    const categories = [];
+    let currentCategory = null;
+    let currentSub = null;
+
+    for (const raw of lines) {
+      const line = raw.trimEnd();
+      if (!line || line === '---') continue;
+
+      const h2 = line.match(/^## (.+)$/);
+      if (h2) {
+        currentCategory = { title: h2[1], subs: [], directItems: [] };
+        categories.push(currentCategory);
+        currentSub = null;
+        continue;
+      }
+
+      const h3 = line.match(/^### (.+)$/);
+      if (h3 && currentCategory) {
+        currentSub = { title: h3[1], items: [] };
+        currentCategory.subs.push(currentSub);
+        continue;
+      }
+
+      const item = line.match(/^- \[([ xX])\] (.+)$/);
+      if (item && currentCategory) {
+        const entry = { id: '', text: item[2], checked: item[1].toLowerCase() === 'x' };
+        if (currentSub) {
+          currentSub.items.push(entry);
+        } else {
+          currentCategory.directItems.push(entry);
+        }
+      }
+    }
+
+    let idx = 0;
+    for (const cat of categories) {
+      for (const sub of cat.subs) {
+        for (const item of sub.items) {
+          item.id = `item-${idx++}`;
+        }
+      }
+      for (const item of cat.directItems) {
+        item.id = `item-${idx++}`;
+      }
+    }
+
+    return categories;
+  }
+
+  function loadState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      for (const cat of tree) {
+        for (const sub of cat.subs) {
+          for (const item of sub.items) {
+            if (saved[item.id] !== undefined) item.checked = saved[item.id];
+          }
+        }
+        for (const item of cat.directItems) {
+          if (saved[item.id] !== undefined) item.checked = saved[item.id];
+        }
+      }
+    } catch (_) { /* ignore */ }
+  }
+
+  function saveState() {
+    const state = {};
+    for (const cat of tree) {
+      for (const sub of cat.subs) {
+        for (const item of sub.items) state[item.id] = item.checked;
+      }
+      for (const item of cat.directItems) state[item.id] = item.checked;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function stripEmoji(title) {
+    return title.replace(/^[\s\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+/u, '').trim() || title;
+  }
+
+  function escapeMermaid(text) {
+    return text
+      .replace(/"/g, '#quot;')
+      .replace(/\(/g, '#40;')
+      .replace(/\)/g, '#41;')
+      .replace(/\[/g, '#91;')
+      .replace(/\]/g, '#93;')
+      .replace(/</g, '#lt;')
+      .replace(/>/g, '#gt;')
+      .replace(/&/g, '#amp;')
+      .replace(/\n/g, ' ');
+  }
+
+  function buildMindmapSource() {
+    const branches = [];
+
+    for (const cat of tree) {
+      const catBranches = [];
+
+      for (const sub of cat.subs) {
+        const checked = sub.items.filter(i => i.checked);
+        if (checked.length === 0) continue;
+        const itemLines = checked.map(i => `        ${escapeMermaid(i.text)}`).join('\n');
+        catBranches.push(`      ${escapeMermaid(stripEmoji(sub.title))}\n${itemLines}`);
+      }
+
+      const directChecked = cat.directItems.filter(i => i.checked);
+      if (directChecked.length > 0) {
+        const itemLines = directChecked.map(i => `        ${escapeMermaid(i.text)}`).join('\n');
+        if (cat.subs.length === 0) {
+          catBranches.push(itemLines.replace(/^        /gm, '      '));
+        } else {
+          catBranches.push(`      ${escapeMermaid(stripEmoji(cat.title))}項目\n${itemLines}`);
+        }
+      }
+
+      if (catBranches.length > 0) {
+        branches.push(`    ${escapeMermaid(stripEmoji(cat.title))}\n${catBranches.join('\n')}`);
+      }
+    }
+
+    if (branches.length === 0) return null;
+
+    return `mindmap
+  root((チェック済み))
+${branches.join('\n')}`;
+  }
+
+  async function renderMindmap() {
+    const container = document.getElementById('mindmap-container');
+    const empty = document.getElementById('empty-state');
+    const meta = document.getElementById('mindmap-meta');
+    const source = buildMindmapSource();
+
+    if (!source) {
+      container.hidden = true;
+      container.innerHTML = '';
+      empty.hidden = false;
+      meta.textContent = 'チェックした項目を表示';
+      return;
+    }
+
+    empty.hidden = true;
+    container.hidden = false;
+
+    const id = `mm-${++renderId}`;
+    container.innerHTML = `<pre class="mermaid" id="${id}">${source}</pre>`;
+
+    const checkedTotal = countChecked();
+    meta.textContent = `${checkedTotal} 項目をマップに反映`;
+
+    try {
+      await mermaid.run({ nodes: [document.getElementById(id)] });
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = `<p style="color:#dc2626;padding:20px;">マインドマップの生成に失敗しました。</p>`;
+    }
+  }
+
+  function countChecked() {
+    let n = 0;
+    for (const cat of tree) {
+      for (const sub of cat.subs) n += sub.items.filter(i => i.checked).length;
+      n += cat.directItems.filter(i => i.checked).length;
+    }
+    return n;
+  }
+
+  function countTotal() {
+    let n = 0;
+    for (const cat of tree) {
+      for (const sub of cat.subs) n += sub.items.length;
+      n += cat.directItems.length;
+    }
+    return n;
+  }
+
+  function updateProgress() {
+    const checked = countChecked();
+    const total = countTotal();
+    document.getElementById('checked-count').textContent = checked;
+    document.getElementById('total-count').textContent = total;
+    document.getElementById('progress-fill').style.width = total ? `${(checked / total) * 100}%` : '0%';
+  }
+
+  function onToggle() {
+    saveState();
+    updateProgress();
+    renderMindmap();
+  }
+
+  function renderChecklist() {
+    const root = document.getElementById('checklist-root');
+    root.innerHTML = '';
+
+    for (const cat of tree) {
+      const catEl = document.createElement('div');
+      catEl.className = 'category';
+
+      const catTitle = document.createElement('div');
+      catTitle.className = 'category-title';
+      catTitle.textContent = cat.title;
+      catEl.appendChild(catTitle);
+
+      for (const sub of cat.subs) {
+        const subEl = document.createElement('div');
+        subEl.className = 'subcategory';
+
+        const subTitle = document.createElement('div');
+        subTitle.className = 'subcategory-title';
+        subTitle.textContent = sub.title;
+        subEl.appendChild(subTitle);
+
+        for (const item of sub.items) {
+          subEl.appendChild(createCheckItem(item));
+        }
+        catEl.appendChild(subEl);
+      }
+
+      for (const item of cat.directItems) {
+        catEl.appendChild(createCheckItem(item));
+      }
+
+      root.appendChild(catEl);
+    }
+  }
+
+  function createCheckItem(item) {
+    const label = document.createElement('label');
+    label.className = 'check-item' + (item.checked ? ' checked' : '');
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = item.checked;
+    cb.addEventListener('change', () => {
+      item.checked = cb.checked;
+      label.classList.toggle('checked', item.checked);
+      onToggle();
+    });
+
+    const span = document.createElement('span');
+    span.className = 'item-label';
+    span.textContent = item.text;
+
+    label.appendChild(cb);
+    label.appendChild(span);
+    return label;
+  }
+
+  function setAll(checked) {
+    for (const cat of tree) {
+      for (const sub of cat.subs) sub.items.forEach(i => { i.checked = checked; });
+      cat.directItems.forEach(i => { i.checked = checked; });
+    }
+    renderChecklist();
+    onToggle();
+  }
+
+  document.getElementById('btn-check-all').addEventListener('click', () => setAll(true));
+  document.getElementById('btn-uncheck-all').addEventListener('click', () => setAll(false));
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    tree = parseMarkdown(document.getElementById('checklist-source').textContent);
+    renderChecklist();
+    onToggle();
+  });
+
+  tree = parseMarkdown(document.getElementById('checklist-source').textContent);
+  loadState();
+  renderChecklist();
+  updateProgress();
+  renderMindmap();
+</script>
+
+</body>
+</html>

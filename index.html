@@ -644,6 +644,7 @@
         updateProgress();
         renderTree();
         initPanelResizer();
+        initMindLayoutObserver();
       }
 
       function getCheckedMap() {
@@ -887,6 +888,22 @@
         mind.scale(mind.scaleVal - mind.scaleSensitivity);
       }
 
+      function refreshMindLayout() {
+        if (!mind) return;
+        requestAnimationFrame(() => {
+          mind.toCenter();
+        });
+      }
+
+      function initMindLayoutObserver() {
+        const target = document.getElementById("tree-body");
+        if (!target || target.dataset.layoutObserver === "1") return;
+        target.dataset.layoutObserver = "1";
+        new ResizeObserver(() => {
+          refreshMindLayout();
+        }).observe(target);
+      }
+
       function renderTree() {
         const container = document.getElementById("tree-container");
         const empty = document.getElementById("empty-state");
@@ -910,10 +927,10 @@
         if (isFirstRender) {
           mind = createMindInstance();
           mind.init(data);
-          mind.toCenter();
         } else {
           mind.refresh(data);
         }
+        refreshMindLayout();
 
         meta.textContent = `${countChecked()} 項目をマップに反映`;
       }
@@ -1258,6 +1275,7 @@
         if (checklistCollapsed && !canCollapseChecklist()) {
           setChecklistCollapsed(false);
         }
+        refreshMindLayout();
       });
 
       document.getElementById("btn-reset").addEventListener("click", () => {
